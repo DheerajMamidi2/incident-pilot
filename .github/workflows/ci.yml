@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Verify formatting
+        run: make fmt-check
+
+      - name: Vet
+        run: make vet
+
+      - name: Test with race detector
+        run: make race
+
+      - name: Enforce coverage floor
+        run: make coverage
+
+      - name: Build static binary
+        run: make build
+
+      - name: Audit dependencies and reachable Go code
+        run: make audit
+
+  container:
+    name: Build and smoke-test hardened image
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build --tag incidentpilot:ci .
+
+      - name: Start hardened container
+        run: >-
+          docker run
+          --detach
+          --name incidentpilot-ci
+          --read-only
+          --tmpfs /tmp
+          --security-opt no-new-privileges:true
+          --cap-drop ALL
+          --publish 127.0.0.1:8080:8080
+          incidentpilot:ci
+
+      - name: Verify container health endpoint
+        run: |
+          for attempt in {1..30}; do
+            if curl --fail --silent --show-error http://127.0.0.1:8080/api/health > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs incidentpilot-ci
+          exit 1
+
+      - name: Stop container
+        if: always()
+        run: docker rm --force incidentpilot-ci

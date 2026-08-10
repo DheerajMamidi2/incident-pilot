@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="IncidentPilot demonstrates evidence-linked, human-gated, bounded incident remediation.">
+  <title>IncidentPilot · Bounded incident response</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script src="/assets/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="IncidentPilot home">
+      <span class="brand-mark" aria-hidden="true">IP</span>
+      <span>IncidentPilot</span>
+    </a>
+    <div class="header-status" aria-label="System status">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span>Local control plane</span>
+      <span class="header-divider" aria-hidden="true"></span>
+      <span>Deterministic · $0</span>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Human-gated incident response</p>
+        <h1 id="hero-title">Move from signal to safe action—with proof at every step.</h1>
+        <p class="hero-summary">A dependency-light Go control plane that links every diagnosis to evidence, stops for approval, executes only typed demo actions, and trusts only fresh SLO verification.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#scenarios">Run a scenario</a>
+          <a class="button button-quiet" href="#safety-contract">Inspect safety contract</a>
+        </div>
+      </div>
+
+      <aside class="safety-console" id="safety-contract" aria-label="Safety contract">
+        <div class="console-header">
+          <span>Runtime contract</span>
+          <span class="console-live">ENFORCED</span>
+        </div>
+        <dl class="contract-list">
+          <div><dt>Execution surface</dt><dd>3 typed actions</dd></div>
+          <div><dt>Arbitrary shell</dt><dd class="safe-value">Impossible</dd></div>
+          <div><dt>Approval binding</dt><dd>SHA-256 + TTL</dd></div>
+          <div><dt>Model spend</dt><dd>$0.0000</dd></div>
+          <div><dt>Loop budget</dt><dd>1 iteration</dd></div>
+        </dl>
+        <div class="console-path" aria-label="Loop overview">
+          <span>OBSERVE</span><i aria-hidden="true"></i><span>GATE</span><i aria-hidden="true"></i><span>VERIFY</span>
+        </div>
+      </aside>
+    </section>
+
+    <section class="principles" aria-label="Safety properties">
+      <article><span class="principle-number">01</span><div><h2>Evidence, not vibes</h2><p>Every hypothesis and proposal cites immutable observation IDs.</p></div></article>
+      <article><span class="principle-number">02</span><div><h2>Humans own the boundary</h2><p>The loop halts at <code>AWAITING_APPROVAL</code> with a digest-bound proposal.</p></div></article>
+      <article><span class="principle-number">03</span><div><h2>Recovery must be measured</h2><p>A fresh probe—not executor success—decides resolution.</p></div></article>
+    </section>
+
+    <section class="section scenarios-section" id="scenarios" aria-labelledby="scenario-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Synthetic fault lab</p>
+          <h2 id="scenario-title">Choose an incident to investigate</h2>
+        </div>
+        <p>Each scenario is deterministic, isolated, and safe to replay.</p>
+      </div>
+      <div class="scenario-grid" id="scenario-grid" aria-live="polite">
+        <div class="loading-card">Loading local scenarios…</div>
+      </div>
+    </section>
+
+    <section class="section workspace" id="workspace" aria-labelledby="workspace-title" hidden>
+      <div class="workspace-header">
+        <div>
+          <p class="eyebrow">Incident workspace</p>
+          <h2 id="workspace-title">Incident details</h2>
+          <p class="incident-id" id="incident-id"></p>
+        </div>
+        <div class="state-cluster">
+          <span class="state-label">Current state</span>
+          <span class="state-badge" id="state-badge">—</span>
+        </div>
+      </div>
+
+      <nav class="state-rail" id="state-rail" aria-label="Incident loop progress"></nav>
+
+      <div class="workspace-grid">
+        <div class="workspace-column">
+          <article class="panel slo-panel" aria-labelledby="slo-title">
+            <div class="panel-heading">
+              <div><p class="panel-kicker">Independent check</p><h3 id="slo-title">Service-level objectives</h3></div>
+              <span class="fresh-badge" id="fresh-badge">Awaiting action</span>
+            </div>
+            <div id="slo-comparison"></div>
+          </article>
+
+          <article class="panel" aria-labelledby="evidence-title">
+            <div class="panel-heading">
+              <div><p class="panel-kicker">Typed envelopes</p><h3 id="evidence-title">Evidence ledger</h3></div>
+              <span class="count-badge" id="evidence-count">0 signals</span>
+            </div>
+            <div class="evidence-list" id="evidence-list"></div>
+          </article>
+        </div>
+
+        <div class="workspace-column">
+          <article class="panel diagnosis-panel" aria-labelledby="diagnosis-title">
+            <div class="panel-heading">
+              <div><p class="panel-kicker">Evidence-linked</p><h3 id="diagnosis-title">Triage &amp; proposal</h3></div>
+              <span class="confidence" id="confidence">—</span>
+            </div>
+            <div id="triage-content"></div>
+            <div class="proposal" id="proposal-content"></div>
+          </article>
+
+          <article class="panel approval-panel" id="approval-panel" aria-labelledby="approval-title">
+            <div class="panel-heading">
+              <div><p class="panel-kicker">Mandatory control</p><h3 id="approval-title">Human decision</h3></div>
+              <span class="lock-badge">LOCKED</span>
+            </div>
+            <p class="approval-copy" id="approval-copy">Execution is stopped until an operator approves or rejects the exact proposal digest.</p>
+            <label for="actor">Operator</label>
+            <input id="actor" name="actor" value="demo.operator" maxlength="100" autocomplete="off">
+            <label for="rejection-reason">Rejection reason</label>
+            <input id="rejection-reason" name="rejection-reason" value="Coordinate a manual investigation." maxlength="300" autocomplete="off">
+            <div class="decision-actions">
+              <button class="button button-primary" id="approve-button" type="button">Approve typed action</button>
+              <button class="button button-danger" id="reject-button" type="button">Reject &amp; escalate</button>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="workspace-grid lower-grid">
+        <article class="panel timeline-panel" aria-labelledby="timeline-title">
+          <div class="panel-heading">
+            <div><p class="panel-kicker">Hash-linked audit trail</p><h3 id="timeline-title">Loop timeline</h3></div>
+            <span class="integrity-badge">APPEND-ONLY</span>
+          </div>
+          <ol class="timeline" id="timeline"></ol>
+        </article>
+
+        <article class="panel budget-panel" aria-labelledby="budget-title">
+          <div class="panel-heading">
+            <div><p class="panel-kicker">Bounded by design</p><h3 id="budget-title">Run ledger</h3></div>
+            <span class="zero-cost">$0.0000</span>
+          </div>
+          <dl class="budget-list" id="budget-list"></dl>
+          <div class="cost-list" id="cost-list"></div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <footer>
+    <span>IncidentPilot</span>
+    <span>Go 1.26 · standard library · local-first</span>
+    <span>Built to make safe autonomy inspectable.</span>
+  </footer>
+</body>
+</html>

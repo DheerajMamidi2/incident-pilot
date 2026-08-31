@@ -1,3 +1,3 @@
 module github.com/dheerajmamidi/incidentpilot
 
-go 1.26
+go 1.26.6

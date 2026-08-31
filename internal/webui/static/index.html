@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="IncidentPilot demonstrates evidence-linked, human-gated, bounded incident remediation.">
   <title>IncidentPilot · Bounded incident response</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/styles.css">
   <script src="/assets/app.js" defer></script>
 </head>
@@ -141,7 +142,10 @@
         <article class="panel timeline-panel" aria-labelledby="timeline-title">
           <div class="panel-heading">
             <div><p class="panel-kicker">Hash-linked audit trail</p><h3 id="timeline-title">Loop timeline</h3></div>
-            <span class="integrity-badge">APPEND-ONLY</span>
+            <div class="audit-anchor">
+              <span>Chain anchor</span>
+              <code id="audit-anchor" aria-live="polite">Awaiting events</code>
+            </div>
           </div>
           <ol class="timeline" id="timeline"></ol>
         </article>

@@ -30,6 +30,7 @@ const elements = {
   approveButton: document.querySelector('#approve-button'),
   rejectButton: document.querySelector('#reject-button'),
   timeline: document.querySelector('#timeline'),
+  auditAnchor: document.querySelector('#audit-anchor'),
   budgetList: document.querySelector('#budget-list'),
   costList: document.querySelector('#cost-list'),
   toast: document.querySelector('#toast'),
@@ -140,7 +141,9 @@ function renderIncident() {
   renderEvidence(incident);
   renderTriage(incident);
   renderApproval(incident);
-  renderTimeline(incident.events || []);
+  const events = incident.events || [];
+  renderAuditAnchor(events);
+  renderTimeline(events);
   renderBudget(incident);
 }
 
@@ -266,11 +269,25 @@ function renderTimeline(events) {
     const item = node('li', 'timeline-item');
     item.append(node('span', 'timeline-marker'));
     const content = node('div', 'timeline-content');
-    content.append(node('div', 'timeline-type', event.type), node('p', 'timeline-summary', event.summary));
+    const metadata = node('div', 'timeline-meta');
+    const eventHash = node('code', 'timeline-hash', shortHash(event.hash));
+    const eventTime = node('time', '', formatAuditTime(event.occurred_at));
+    eventTime.dateTime = event.occurred_at;
+    eventHash.title = event.hash;
+    eventHash.setAttribute('aria-label', `Event hash ${event.hash}`);
+    metadata.append(eventTime, eventHash);
+    content.append(node('div', 'timeline-type', event.type), node('p', 'timeline-summary', event.summary), metadata);
     item.append(content, node('span', 'timeline-seq', `#${String(event.sequence).padStart(2, '0')}`));
     return item;
   });
   elements.timeline.replaceChildren(...items);
+}
+
+function renderAuditAnchor(events) {
+  const latestHash = events.at(-1)?.hash;
+  elements.auditAnchor.textContent = latestHash ? shortHash(latestHash) : 'Awaiting events';
+  elements.auditAnchor.title = latestHash || '';
+  elements.auditAnchor.setAttribute('aria-label', latestHash ? `Current audit chain anchor ${latestHash}` : 'No audit chain anchor yet');
 }
 
 function renderBudget(incident) {
@@ -317,6 +334,17 @@ function formatNumber(value) {
 function formatTime(value) {
   if (!value) return '—';
   return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+function formatAuditTime(value) {
+  if (!value) return '—';
+  return new Date(value).toLocaleString([], { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+function shortHash(value) {
+  if (!value) return '—';
+  const digest = value.replace(/^sha256:/, '');
+  return `${digest.slice(0, 10)}…${digest.slice(-8)}`;
 }
 
 elements.approveButton.addEventListener('click', () => decide('approve'));

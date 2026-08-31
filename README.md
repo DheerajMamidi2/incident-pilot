@@ -15,6 +15,7 @@ There is no LLM, cloud service, database, arbitrary shell, or paid dependency. T
 - Executor success cannot resolve an incident. A separate verifier obtains fresh telemetry and recomputes every SLO check.
 - `FAIL` and `INCONCLUSIVE` verification outcomes stop in `ESCALATED`; the MVP never auto-replans.
 - Audit events are append-only defensive copies with sequence numbers and a SHA-256 hash chain.
+- The dashboard surfaces each event timestamp and digest plus the current terminal chain anchor for direct audit inspection.
 - Every deterministic stage records a `$0` cost-ledger entry.
 
 ## Architecture
@@ -74,7 +75,7 @@ Budgets are created once with the incident and cannot reset inside a run. The MV
 
 ## Run locally
 
-Requirements: Go 1.26.
+Requirements: Go 1.26.6 or newer within the Go 1.26 release line.
 
 ```bash
 make run

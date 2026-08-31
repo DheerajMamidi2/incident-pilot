@@ -18,6 +18,7 @@ func TestEmbeddedDashboardAssets(t *testing.T) {
 		{path: "/index.html", contentType: "text/html", contains: "Human-gated", cache: "no-store"},
 		{path: "/assets/styles.css", contentType: "text/css", contains: ":root", cache: "public"},
 		{path: "/assets/app.js", contentType: "text/javascript", contains: "AWAITING_APPROVAL", cache: "public"},
+		{path: "/favicon.svg", contentType: "image/svg+xml", contains: "<svg", cache: "public"},
 	}
 	handler := NewHandler()
 	for _, test := range tests {
@@ -38,6 +39,24 @@ func TestEmbeddedDashboardAssets(t *testing.T) {
 				t.Fatalf("body does not contain %q", test.contains)
 			}
 		})
+	}
+}
+
+func TestDashboardSurfacesAuditHashProof(t *testing.T) {
+	handler := NewHandler()
+
+	index := httptest.NewRecorder()
+	handler.ServeHTTP(index, httptest.NewRequest(http.MethodGet, "http://example.test/", nil))
+	if !strings.Contains(index.Body.String(), `id="audit-anchor"`) {
+		t.Fatal("dashboard does not expose an audit anchor")
+	}
+
+	script := httptest.NewRecorder()
+	handler.ServeHTTP(script, httptest.NewRequest(http.MethodGet, "http://example.test/assets/app.js", nil))
+	for _, expected := range []string{"renderAuditAnchor", "timeline-meta", "shortHash", "eventTime.dateTime"} {
+		if !strings.Contains(script.Body.String(), expected) {
+			t.Fatalf("dashboard script does not contain %q", expected)
+		}
 	}
 }
 

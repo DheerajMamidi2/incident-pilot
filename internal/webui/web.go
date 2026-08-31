@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-//go:embed static/index.html static/styles.css static/app.js
+//go:embed static/index.html static/styles.css static/app.js static/favicon.svg
 var assets embed.FS
 
 type Handler struct{}
@@ -34,6 +34,9 @@ func (Handler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	case "/assets/app.js":
 		path = "static/app.js"
 		contentType = "text/javascript; charset=utf-8"
+	case "/favicon.svg":
+		path = "static/favicon.svg"
+		contentType = "image/svg+xml"
 	default:
 		http.NotFound(response, request)
 		return
